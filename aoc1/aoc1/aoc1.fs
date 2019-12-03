@@ -6,6 +6,7 @@ open System.IO
 let massToFuel input = input / 3 - 2
 
 let part1 = Array.sumBy (Int32.Parse >> massToFuel)
+
 let part2 =
     let rec accumulator input =
         match massToFuel input with
