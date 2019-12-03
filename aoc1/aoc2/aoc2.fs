@@ -3,16 +3,20 @@ module aoc2
 open System
 open System.IO
 
-let rec processOpCode offset (state: byref<int array>) =
-    match Seq.skip offset state |> Seq.truncate 4 |> List.ofSeq with
-    | 1::pos1::pos2::resultPos::_ ->
-        state.[resultPos] <- (state.[pos1] + state.[pos2])
-        processOpCode (offset + 4) &state
-    | 2::pos1::pos2::resultPos::_ ->
-        state.[resultPos] <- (state.[pos1] * state.[pos2])
-        processOpCode (offset + 4) &state
-    | 99::_ -> ()
+let opCodeOperation = function
+    | 1 -> (+)
+    | 2 -> (*)
     | _ -> failwith "Invalid opcode"
+
+let rec processOpCode offset (state: byref<int array>) =
+    match Array.item offset state with
+    | 99 -> state
+    | n ->
+        let pos1 = state.[offset + 1]
+        let pos2 = state.[offset + 2]
+        let resultPos = state.[offset + 3]
+        state.[resultPos] <- (opCodeOperation n) state.[pos1] state.[pos2]
+        processOpCode (offset + 4) &state
 
 let step1 input =
     let mutable input' = Array.copy input
@@ -30,16 +34,14 @@ let step2 input =
         let mutable input' = Array.copy input
         input'.[1] <- noun
         input'.[2] <- verb
-        processOpCode 0 &input'
-        Array.head input' = 19690720
+        
+        Array.head (processOpCode 0 &input') = 19690720
     )
-
 
 [<EntryPoint>]
 let main argv =
     let input = File.ReadAllText("input.txt") |> fun input -> input.Split(",") |> Array.map Int32.Parse
-    step1 input
 
-    printfn "%A" <| Array.head input
+    printfn "%A" <| Array.head (step1 input)
     printfn "%d%d" <|| step2 input
     0 // return an integer exit code
