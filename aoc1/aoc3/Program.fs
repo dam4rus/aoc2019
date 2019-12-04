@@ -7,28 +7,35 @@ let rec processInputs (startX, startY) (inputs: string list) =
         let moveCount = Seq.tail input |> Array.ofSeq |> String |> Int32.Parse
         let coordinates =
             match Seq.head input with
-            | 'R' -> [ for x in startX .. startX + moveCount do yield (x, startY) ]
-            | 'U' -> [ for y in startY .. startY + moveCount do yield (startX, y) ]
-            | 'L' -> [ for x in startX .. -1 .. startX - moveCount do yield (x, startY) ]
-            | 'D' -> [ for y in startY .. -1 .. startY - moveCount do yield (startX, y) ]
+            | 'R' -> seq { for x in startX + 1 .. startX + moveCount do yield (x, startY) }
+            | 'U' -> seq { for y in startY + 1 .. startY + moveCount do yield (startX, y) }
+            | 'L' -> seq { for x in startX - 1 .. -1 .. startX - moveCount do yield (x, startY) }
+            | 'D' -> seq { for y in startY - 1 .. -1 .. startY - moveCount do yield (startX, y) }
             | _ -> failwith "Invalid direction"
 
-        coordinates @ processInputs (List.last coordinates) rest
-    | [] -> []
+        Seq.append (processInputs (Seq.last coordinates) rest) coordinates
+    | [] -> Seq.empty
 
 let manhattanDistance (x, y) = abs x + abs y
 
-let part1 input =
-    Set.intersect (Array.head input) (Array.last input)
-    |> Set.remove (0, 0)
-    |> Seq.map manhattanDistance
+let part1 intersections =
+    Seq.map manhattanDistance intersections
     |> Seq.min
+
+
+let part2 (firstWire: (int * int) seq) (secondWire: (int * int) seq) intersections =
+    Set.map (fun position -> (Seq.findIndex ((=) position) firstWire + Seq.findIndex ((=) position) secondWire) + 2) intersections
+    |> Set.minElement
 
 [<EntryPoint>]
 let main argv =
     let wires =
         File.ReadAllLines("input.txt")
-        |> Array.map ((fun line -> line.Split ',') >> List.ofArray >> processInputs (0, 0) >> Set.ofList)
+        |> Array.map ((fun line -> line.Split ',') >> List.ofArray >> processInputs (0, 0))
 
-    printfn "%d" (part1 wires)
+    let firstWire = Array.head wires
+    let secondWire = Array.last wires
+    let intersections = Set.intersect (Set.ofSeq firstWire) (Set.ofSeq secondWire)
+    printfn "%d" (part1 intersections)
+    printfn "%d" (part2 firstWire secondWire intersections)
     0 // return an integer exit code

@@ -6,6 +6,10 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="aoc1.fs" />
   </ItemGroup>
+  <ItemGroup />
 </Project>
