@@ -23,7 +23,7 @@ let part1 intersections =
     |> Seq.min
 
 
-let part2 (firstWire: (int * int) seq) (secondWire: (int * int) seq) intersections =
+let part2 firstWire secondWire intersections =
     Set.map (fun position -> (Seq.findIndex ((=) position) firstWire + Seq.findIndex ((=) position) secondWire) + 2) intersections
     |> Set.minElement
 
