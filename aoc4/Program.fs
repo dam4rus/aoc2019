@@ -8,15 +8,14 @@ let stepDigits digits =
     | Some index -> List.take index digits @ List.init (6 - index) (fun _ -> (List.item index digits) + 1)
     | None -> List.take 5 digits @ [ List.last digits + 1 ]
 
+let rec countValidPasswordsBy digits count (matcher: (int list -> bool)) =
+    match digitsToInt digits with
+    | n when n < passwordMax -> countValidPasswordsBy (stepDigits digits) (if matcher digits then count + 1 else count) matcher
+    | _ -> count
+
 let part1 () =
     let hasPairwiseMatch = Seq.pairwise >> Seq.exists (fun (first, second) -> first = second)
-
-    let rec iterate digits count =
-        match digitsToInt digits with
-        | n when n < passwordMax -> iterate (stepDigits digits) (if hasPairwiseMatch digits then count + 1 else count)
-        | _ -> count
-
-    iterate [ 1; 4; 5; 8; 8; 8 ] 0
+    countValidPasswordsBy [ 1; 4; 5; 8; 8; 8 ] 0 hasPairwiseMatch
 
 let part2 () =
     let rec onlyPairwise = function
@@ -25,14 +24,7 @@ let part2 () =
         | head :: rest -> onlyPairwise <| List.skipWhile ((=) head) rest
         | [] -> false
 
-    let rec iterate digits count =
-        match digitsToInt digits with
-        | n when n < passwordMax ->
-            
-            iterate (stepDigits digits) (if onlyPairwise digits then count + 1 else count)
-        | _ -> count
-
-    iterate [ 1; 4; 5; 8; 8; 8 ] 0
+    countValidPasswordsBy [ 1; 4; 5; 8; 8; 8 ] 0 onlyPairwise
 
 [<EntryPoint>]
 let main argv =
