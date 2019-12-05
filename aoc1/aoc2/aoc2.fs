@@ -10,13 +10,14 @@ let opCodeOperation = function
 
 let rec processOpCode offset (state: byref<int array>) =
     match Array.item offset state with
-    | 99 -> state
-    | n ->
+    | 1 | 2 as n ->
         let pos1 = state.[offset + 1]
         let pos2 = state.[offset + 2]
         let resultPos = state.[offset + 3]
         state.[resultPos] <- (opCodeOperation n) state.[pos1] state.[pos2]
         processOpCode (offset + 4) &state
+    | 99 -> state
+    | _ -> failwith "Invalid opcode"
 
 let step1 input =
     let mutable input' = Array.copy input
