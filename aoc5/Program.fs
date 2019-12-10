@@ -19,43 +19,41 @@ let getValueByMode instructionPtr (state: int array) mode =
     | _ -> failwith "Invalid opcode"
 
 
-let rec processOpCode instructionPtr inputValue (state: byref<int array>) =
+let rec processOpCode instructionPtr inputValue state =
     let opCode = (Array.item instructionPtr state)
     let getParameterMode paramIndex = opCode / (pown 10 (paramIndex + 2)) % 10
-    let getParameterValue paramIndex (state: int array) = getValueByMode (instructionPtr + paramIndex + 1) state (getParameterMode paramIndex)
-    let getFirstParameterValue state = getParameterValue 0 state
-    let getSecondParameterValue state = getParameterValue 1 state
+    let getParameterValue paramIndex = getValueByMode (instructionPtr + paramIndex + 1) state (getParameterMode paramIndex)
+    let getFirstParameterValue () = getParameterValue 0
+    let getSecondParameterValue () = getParameterValue 1
 
     match opCode % 100 with
     | 1 | 2 | 7 | 8 as instruction ->
         let resultPos = state.[instructionPtr + 3]
-        state.[resultPos] <- (instructionBinaryOp instruction) (getFirstParameterValue state) (getSecondParameterValue state)
-        processOpCode (instructionPtr + 4) inputValue &state
+        state.[resultPos] <- (instructionBinaryOp instruction) (getFirstParameterValue ()) (getSecondParameterValue ())
+        processOpCode (instructionPtr + 4) inputValue state
     | 3 ->
         let outputPosition = state.[instructionPtr + 1]
         state.[outputPosition] <- inputValue
-        processOpCode (instructionPtr + 2) inputValue &state
+        processOpCode (instructionPtr + 2) inputValue state
     | 4 ->
         let position = state.[instructionPtr + 1]
-        [ state.[position] ] @ processOpCode (instructionPtr + 2) inputValue &state
+        [ state.[position] ] @ processOpCode (instructionPtr + 2) inputValue state
     | 5 | 6 as instruction ->
-        let testedValue = (getFirstParameterValue state)
-        let destValue = (getSecondParameterValue state)
+        let testedValue = (getFirstParameterValue ())
+        let destValue = (getSecondParameterValue ())
         let nextAddress = if (instructionUnaryOp instruction) testedValue then destValue else instructionPtr + 3
-        processOpCode nextAddress inputValue &state
+        processOpCode nextAddress inputValue state
     | 99 -> []
     | _ -> failwith "Invalid opcode"
 
 let part1 () =
-    let mutable instructions = Array.copy input
-    processOpCode 0 1 &instructions
+    processOpCode 0 1 (Array.copy input) |> List.last
 
 let part2 () = 
-    let mutable instructions = Array.copy input
-    processOpCode 0 5 &instructions
+    processOpCode 0 5 (Array.copy input) |> List.last
 
 [<EntryPoint>]
 let main argv =
-    printfn "%A" (part1 ())
-    printfn "%A" (part2 ())
+    printfn "%d" (part1 ())
+    printfn "%d" (part2 ())
     0 // return an integer exit code
