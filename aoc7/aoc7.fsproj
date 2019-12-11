@@ -5,15 +5,15 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>af30fd85-e2b6-47cf-ae8c-cabe34da1e7f</ProjectGuid>
+    <ProjectGuid>d6cb2eed-a6ad-45be-8734-e1ed4edb18cf</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>aoc5</RootNamespace>
-    <AssemblyName>aoc5</AssemblyName>
+    <RootNamespace>aoc7</RootNamespace>
+    <AssemblyName>aoc7</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <UseStandardResourceNames>true</UseStandardResourceNames>
     <WarningsAsErrors>3239;$(WarningsAsErrors)</WarningsAsErrors>
-    <Name>aoc5</Name>
+    <Name>aoc7</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
