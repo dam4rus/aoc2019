@@ -11,18 +11,45 @@ let rec permutations = function
     | [] -> seq [ [] ]
 
 let part1 () =
-    permutations [ 0; 1; 2; 3; 4 ]
-    |> Seq.map (List.fold (fun state phase -> List.last <| Computer.runWithOutput (Some <| Computer.Input.Draining [phase; state]) (Array.copy input)) 0)
+    permutations [ 0L; 1L; 2L; 3L; 4L ]
+    |> Seq.map (List.fold (fun state phase -> Program.create (Some <| Input.Draining [ phase; state ]) (Array.map int64 input) |> Program.iterateOutput |> Seq.last) 0L)
+    |> Seq.max
+
+let part2 () =
+    let rec loop amplifierIndex (amplifiers: Program []) =
+        let nextAmplifierIndex = (amplifierIndex + 1) % 5
+        match Program.processOpCode amplifiers.[amplifierIndex] with
+        | Program.Output (output, state) ->
+            let newInput =
+                match amplifiers.[nextAmplifierIndex].input with
+                | Some (Input.Draining oldInput) -> oldInput @ [ output ]
+                | _ -> [ output ]
+
+            amplifiers.[amplifierIndex] <- state
+            amplifiers.[nextAmplifierIndex] <- { amplifiers.[nextAmplifierIndex] with input = Some (Input.Draining newInput) }
+            loop nextAmplifierIndex amplifiers
+        | Program.ProgramEnd ->
+            if amplifierIndex = 4 then
+                amplifiers 
+            else
+                loop nextAmplifierIndex amplifiers
+
+    permutations [ 5L; 6L; 7L; 8L; 9L ]
+    |> Seq.map (
+        Seq.indexed
+        >> Seq.map (fun (idx, phase) ->
+            let amplifierInputs = if idx = 0 then [ phase; 0L ] else [ phase ]
+            Program.create (Some <| Input.Draining amplifierInputs) (Array.map int64 input)
+        )
+        >> Array.ofSeq
+        >> loop 0
+        >> Array.last
+        >> fun amp -> amp.lastOutput |> Option.get
+    )
     |> Seq.max
 
 [<EntryPoint>]
 let main argv =
-    //let testInput = [| 3; 26; 1001; 26; -4; 26; 3; 27; 1002; 27; 2; 27; 1; 27; 26; 27; 4; 27; 1001; 28; -1; 28; 1005; 28; 6; 99; 0; 0; 5 |]
-    
-    //let result =
-    //    permutations [ 9; 8; 7; 6; 5 ]
-    //    |> Seq.map (List.fold (fun state phase -> List.last <| Computer.runWithOutput (Some <| Computer.Input.Draining [phase; state]) (Array.copy input)) 0)
-    //    |> Seq.max
-
     printfn "%d" (part1 ())
+    printfn "%d" (part2 ())
     0 // return an integer exit code

@@ -11,12 +11,12 @@ let part1 input =
 type Object = { name: string; prev: Object option; }
 
 let part2 input =
-    let rec addObjects prev objectName =
+    let rec collectObjects prev objectName =
         let object = { name = objectName; prev = prev }
-        let siblings = Map.tryFind objectName input |> Option.map (List.collect (addObjects (Some object))) |> Option.defaultValue List.empty
+        let siblings = Map.tryFind objectName input |> Option.map (List.collect (collectObjects <| Some object)) |> Option.defaultValue List.empty
         object :: siblings
 
-    let objects = addObjects None "COM"
+    let objects = collectObjects None "COM"
     let santaOrbit = List.find (fun object -> object.name = "SAN") objects
     let myOrbit = List.find (fun object -> object.name = "YOU") objects
 
