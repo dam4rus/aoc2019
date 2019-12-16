@@ -4,11 +4,6 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../Intcode/Intcode.fsproj">
-      <Name>Intcode.fsproj</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="aoc5.fs" />
+    <Compile Include="aoc3.fs" />
   </ItemGroup>
 </Project>

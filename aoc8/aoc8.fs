@@ -7,10 +7,9 @@ let chunkSize = imageWidth * imageHeight
 
 let part1 () =
     Seq.chunkBySize chunkSize input
-    |> Seq.minBy (Seq.filter ((=) '0') >> Seq.length)
-    |> Seq.filter ((<>) '0')
-    |> Seq.fold (fun (onesCount, twosCount) ch -> if ch = '1' then (onesCount + 1, twosCount) else (onesCount, twosCount + 1)) (0, 0)
-    |> fun (onesCount, twosCount) -> onesCount * twosCount
+    |> Seq.map (Seq.countBy id >> Map.ofSeq)
+    |> Seq.minBy (Map.find '0')
+    |> fun map -> map.['1'] * map.['2']
 
 let part2 () =
     let overwriteTransparentPixels state layer =
