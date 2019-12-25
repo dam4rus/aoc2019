@@ -19,7 +19,7 @@ let part1 () =
 
 let part2 () =
     let rec onlyPairwise = function
-        | first :: second :: [] -> first = second
+        | first :: [ second ] -> first = second
         | first :: second :: third :: _ when first = second && first <> third -> true
         | head :: rest -> onlyPairwise <| List.skipWhile ((=) head) rest
         | [] -> false
