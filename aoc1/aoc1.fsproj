@@ -11,5 +11,5 @@
     </Content>
     <Compile Include="aoc1.fs" />
   </ItemGroup>
-  <ItemGroup />
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

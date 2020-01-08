@@ -7,12 +7,12 @@ let rec insertions x = function
     | [] -> [[x]]
 
 let rec permutations = function
-    | x :: xs -> Seq.concat (Seq.map (insertions x) (permutations xs))
+    | x :: xs -> Seq.collect (insertions x) (permutations xs)
     | [] -> seq [ [] ]
 
 let part1 () =
     permutations [ 0L; 1L; 2L; 3L; 4L ]
-    |> Seq.map (List.fold (fun state phase -> Program.create (Some <| Input.Draining [ phase; state ]) (Array.map int64 input) |> Program.iterateOutput |> Seq.last) 0L)
+    |> Seq.map (List.fold (fun state phase -> Program.create (Some <| Draining [ phase; state ]) (Array.map int64 input) |> Program.iterateOutput |> Seq.last) 0L)
     |> Seq.max
 
 let part2 () =
