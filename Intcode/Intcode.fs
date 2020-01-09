@@ -47,7 +47,7 @@ module Program =
                 let secondParamter = (int64 (getInputParameterValue 1))
                 BinaryOp ((instructionBinaryOp instruction) firstParameter secondParamter)
             | 3 -> WriteInput
-            | 4 -> PrintOutput program.code.[getOutputParameterPosition 0]
+            | 4 -> PrintOutput (getInputParameterValue 0)
             | 5 | 6 as instruction ->
                 let testResult = ((instructionUnaryOp instruction) (getInputParameterValue 0))
                 JumpIf (if testResult then (getInputParameterValue 1) else program.instructionPtr + 3L)

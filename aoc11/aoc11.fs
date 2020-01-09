@@ -12,9 +12,9 @@ module Robot =
     let turnLeft robot =
         match robot.direction with
         | Up -> { robot with direction = Left }
-        | Right -> { robot with direction = Up }
-        | Down -> { robot with direction = Right }
         | Left -> { robot with direction = Down }
+        | Down -> { robot with direction = Right }
+        | Right -> { robot with direction = Up }
 
     let turnRight robot =
         match robot.direction with
@@ -43,20 +43,16 @@ let part1 () =
 
     let rec loop program robot paintedCoords =
         let colorAtRobot = Map.tryFind robot.position paintedCoords |> Option.defaultValue Color.Black
-        //printfn "input = %d" (int64 colorAtRobot)
         match Program.processOpCode { program with input = Some <| Persistent (int64 colorAtRobot) } with
-        | Program.Output (output, program) when output = 0L || output = 1L ->
+        | Program.Output (output, program) ->
             let paintedCoords = Map.add robot.position (enum<Color> (int output)) paintedCoords
             match Program.processOpCode program with
             | Program.Output (output, program) ->
-                //printfn "turn direction = %d" output
                 let robot = Robot.turn (int output) robot |> Robot.moveForward
                 loop program robot paintedCoords
             | Program.ProgramEnd -> paintedCoords
-        | Program.Output (_, program) -> loop program robot paintedCoords
         | Program.ProgramEnd -> paintedCoords
 
-    //printfn "%A" (Program.iterateOutput initialState |> List.ofSeq)
     loop initialState (Robot.create ()) Map.empty
     |> Map.count
 
